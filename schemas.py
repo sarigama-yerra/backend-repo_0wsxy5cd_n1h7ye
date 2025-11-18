@@ -12,7 +12,7 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List, Literal
 
 # Example schemas (replace with your own):
 
@@ -38,11 +38,31 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Survey-related schemas
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class SurveyQuestion(BaseModel):
+    id: str
+    topic: str
+    text: str
+    type: Literal["scale", "single", "text"] = "scale"
+    options: Optional[List[str]] = None
+
+class Survey(BaseModel):
+    survey_id: str
+    title: str
+    description: str
+    questions: List[SurveyQuestion]
+
+class SurveyAnswer(BaseModel):
+    question_id: str
+    answer: str
+
+class SurveyResponse(BaseModel):
+    """
+    Survey responses collection schema
+    Collection name: "surveyresponse"
+    """
+    survey_id: str
+    answers: List[SurveyAnswer]
+    user_agent: Optional[str] = None
+    ip: Optional[str] = None
